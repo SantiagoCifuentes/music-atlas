@@ -1,4 +1,4 @@
-# Music Atlas MVP Requirements
+﻿# Music Atlas MVP Requirements
 
 ## Product Vision
 
@@ -62,11 +62,15 @@ The following are intentionally excluded from the MVP:
 
 ## Domain Notes
 
+Settled domain decisions are tracked in [domain-decisions.md](domain-decisions.md). The notes below summarize the product concepts that matter for the MVP.
+
 ### Country
 
 For the MVP, England is the only country focus.
 
 The country acts as the broad organizing context for discovery. It does not require every entry to be exclusively English, only that the entry has a meaningful historical, cultural, geographical, or artistic connection to England.
+
+A meaningful England connection exists when England played a substantial historical, cultural, geographical, or artistic role in the development, consolidation, evolution, or cultural context of the entry. Mere popularity, commercial presence, or influence in England is not sufficient on its own.
 
 ### Genre
 
@@ -88,6 +92,8 @@ Examples that may be relevant to the England MVP include:
 - Trip hop
 
 Genres can cross places, time periods, and scenes. A genre may appear in several scenes, and a scene may contain several genres.
+
+Genre and Scene are distinct concepts even when similar or identical labels are used. The distinction should be clear from the editorial context rather than forced through artificial renaming.
 
 ### Scene
 
@@ -112,6 +118,8 @@ A simple working distinction:
 >
 > Scene asks: where, when, and among whom did this music live?
 
+Every Scene in the MVP should have a defined time period representing when it emerged, developed, or was particularly active. A Scene can have an ongoing or open-ended period.
+
 ### Genre and Scene Relationship
 
 Genre and Scene should remain distinct domain concepts in the MVP.
@@ -128,6 +136,8 @@ The MVP should allow:
 
 The MVP should not introduce complex hierarchy, weighting, or taxonomy rules yet.
 
+Movements, subgenres, eras, and regional identities should remain descriptive context for the MVP unless they are accurately represented by an existing Genre or Scene entry.
+
 ### Artist
 
 An artist is a person or group connected to one or more genres, scenes, and albums.
@@ -136,6 +146,8 @@ For the MVP, an artist should be included when there is a meaningful connection 
 
 The MVP should not attempt to represent full biographies or complete discographies.
 
+Every Artist included in the MVP should have at least one curated Album associated with them.
+
 ### Album
 
 An album is a curated listening entry connected to an artist.
@@ -143,6 +155,18 @@ An album is a curated listening entry connected to an artist.
 For the MVP, albums should be selected because they help users enter or understand a genre, scene, artist, or historical moment connected to England.
 
 The MVP should not include full discographies or track-level detail.
+
+Every Album should be associated with at least one Genre. Scene association is optional and should be used only when the Album has a meaningful relationship with a specific Scene.
+
+"Album" is an editorial product concept for the MVP. Studio albums are the primary case, but EPs, mixtapes, compilations, and live albums may also be included when they have clear curatorial value.
+
+## Curation Notes
+
+Curated content means selected intentionally for discovery value, clarity, and relevance. It does not mean exhaustive, canonical, or universally definitive.
+
+Curated descriptions should be concise, generally one or two short paragraphs, and should explain why the entry is relevant to Music Atlas. Descriptions should adapt to the entry type rather than follow a rigid template.
+
+Content should be traceable to reliable sources during research and curation, but sources do not need to be user-facing or first-class product concepts in the MVP.
 
 ## Core User Journeys
 
@@ -204,11 +228,10 @@ Content selection should avoid:
 
 - Should the MVP voice be more beginner-friendly, more critic-curated, or somewhere between the two?
 - Should the initial content balance historical foundations and contemporary discovery, or lean toward one?
-- Should scenes always have a geographic anchor, or can they also be label-based, venue-based, media-based, or movement-based?
 - Should the MVP include explicit "start here" recommendations, such as a short listening path or essential albums list?
 - How much broader UK context should be allowed when explaining entries connected to England?
 - How should the product handle artists or albums with meaningful connections to multiple countries?
-- Should sources or references be visible to users in the MVP, or tracked only internally at first?
+- What lightweight internal source-tracking approach should be used during content creation and review?
 
 ## Acceptance Criteria
 
@@ -222,6 +245,10 @@ The MVP requirements are satisfied when:
 - Scene pages can connect to genres, artists, and albums.
 - Artist pages can connect to genres, scenes, and albums.
 - Album pages can connect to artists, genres, and scenes.
+- Every Artist has at least one curated Album.
+- Every Album has at least one Genre.
+- Album-to-Scene association is optional and used only when meaningful.
+- Every Scene has a defined time period, including open-ended or ongoing periods when appropriate.
 - The content dataset is intentionally small and real.
 - Content follows the principle: "For MVP purposes, content should have a meaningful historical, cultural, geographical, or artistic connection to England."
 - The MVP excludes integrations, accounts, public submissions, full discographies, database design, API design, application architecture, and implementation planning.
