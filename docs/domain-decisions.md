@@ -1,4 +1,4 @@
-# Music Atlas Domain Decisions
+﻿# Music Atlas Domain Decisions
 
 These decisions clarify the Music Atlas MVP domain after the initial requirements review and domain analysis. They are product/domain decisions only; they do not define database design, API design, application architecture, or implementation structure.
 
@@ -86,3 +86,39 @@ The description should adapt to the type of entry rather than follow a rigid tem
 - Album: Explain what the release is and why it is relevant to understanding the Artist, Genre, Scene, or historical context.
 
 Descriptions should provide useful context without attempting to be exhaustive historical accounts.
+
+## 11. Editorial Voice
+
+Music Atlas should use an accessible, informative, and curated editorial voice.
+
+Content should be understandable to someone discovering the subject for the first time while still providing meaningful historical and musical context.
+
+The voice should avoid both academic over-explanation and critic-style judgments or rankings.
+
+## 12. Period Balance
+
+The initial dataset should prioritize historically significant foundations and developments, while including contemporary artists or scenes when they provide meaningful value to the discovery experience.
+
+No fixed historical-to-contemporary ratio is required for the MVP.
+
+## 13. Broader UK Context
+
+Broader UK context is allowed when it is relevant to understanding an entry, but England must remain the primary geographic and editorial focus of the MVP.
+
+UK-wide context should not independently justify inclusion of an entry.
+
+## 14. Internal Source Tracking
+
+Each curated entry should retain a lightweight internal research note containing the main sources consulted, including the source name or title, URL when available, and date consulted.
+
+Additional notes may identify which factual or historical claims were verified.
+
+This information is for internal traceability and is not required to be displayed to users.
+
+## 15. Start Here Paths
+
+Explicitly labelled "Start here" recommendations are not part of the MVP.
+
+Discovery should remain relationship-led through Countries, Genres, Scenes, Artists, and Albums.
+
+Curated descriptions may naturally highlight why an entry is relevant, but the MVP will not introduce a separate recommendation layer.

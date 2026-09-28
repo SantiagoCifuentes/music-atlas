@@ -50,6 +50,7 @@ The following are intentionally excluded from the MVP:
 - Automated data ingestion
 - Advanced search
 - Recommendation algorithms
+- Explicitly labelled "Start here" recommendation paths
 - Interactive map as the primary experience
 - Track-level data
 - Full artist discographies
@@ -166,7 +167,11 @@ Curated content means selected intentionally for discovery value, clarity, and r
 
 Curated descriptions should be concise, generally one or two short paragraphs, and should explain why the entry is relevant to Music Atlas. Descriptions should adapt to the entry type rather than follow a rigid template.
 
+Music Atlas should use an accessible, informative, and curated editorial voice. Content should be understandable to someone discovering the subject for the first time while still providing meaningful historical and musical context. It should avoid both academic over-explanation and critic-style judgments or rankings.
+
 Content should be traceable to reliable sources during research and curation, but sources do not need to be user-facing or first-class product concepts in the MVP.
+
+Each curated entry should retain a lightweight internal research note containing the main sources consulted, including the source name or title, URL when available, and date consulted. Additional notes may identify which factual or historical claims were verified.
 
 ## Core User Journeys
 
@@ -196,6 +201,8 @@ A user can move through related entries without needing prior expertise. For exa
 
 England -> London grime scene -> Grime -> Dizzee Rascal -> Boy in da Corner
 
+Discovery remains relationship-led through Countries, Genres, Scenes, Artists, and Albums. Explicitly labelled "Start here" recommendations are not part of the MVP.
+
 ## Initial Content Boundaries
 
 The initial dataset should be real, small, and curated.
@@ -215,23 +222,20 @@ Content selection should favor:
 - Representation across different periods and styles
 - Clear relationships between scenes, genres, artists, and albums
 - Concise explanations over exhaustive coverage
+- Historically significant foundations and developments, with contemporary artists or scenes included when they add meaningful discovery value
 
 Content selection should avoid:
 
 - Entries with only weak or incidental connection to England
 - Trying to cover every important artist or album
 - Treating England as culturally isolated from broader UK, Caribbean, Irish, South Asian, African, European, or global influences
+- Using UK-wide context as the sole reason to include an entry
 - Flattening scenes into genres
 - Presenting complex attribution questions as settled when they are not
 
 ## Open Questions
 
-- Should the MVP voice be more beginner-friendly, more critic-curated, or somewhere between the two?
-- Should the initial content balance historical foundations and contemporary discovery, or lean toward one?
-- Should the MVP include explicit "start here" recommendations, such as a short listening path or essential albums list?
-- How much broader UK context should be allowed when explaining entries connected to England?
-- How should the product handle artists or albums with meaningful connections to multiple countries?
-- What lightweight internal source-tracking approach should be used during content creation and review?
+No MVP-blocking product or domain questions remain open before the next lifecycle stage. Future work may revisit cross-country attribution when Music Atlas expands beyond England.
 
 ## Acceptance Criteria
 
@@ -251,5 +255,8 @@ The MVP requirements are satisfied when:
 - Every Scene has a defined time period, including open-ended or ongoing periods when appropriate.
 - The content dataset is intentionally small and real.
 - Content follows the principle: "For MVP purposes, content should have a meaningful historical, cultural, geographical, or artistic connection to England."
+- Broader UK context is used only when relevant to understanding an England-connected entry.
+- Explicitly labelled "Start here" recommendation paths are excluded from the MVP.
+- Curated entries retain lightweight internal source notes for traceability.
 - The MVP excludes integrations, accounts, public submissions, full discographies, database design, API design, application architecture, and implementation planning.
-- Open product questions are documented before later architecture or implementation work begins.
+- No MVP-blocking product or domain questions remain open before the next lifecycle stage.
