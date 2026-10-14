@@ -1,0 +1,21 @@
+{
+  "name": "music-atlas",
+  "private": true,
+  "workspaces": [
+    "apps/backend",
+    "apps/frontend"
+  ],
+  "scripts": {
+    "dev:backend": "npm run dev --workspace @music-atlas/backend",
+    "dev:frontend": "npm run dev --workspace @music-atlas/frontend",
+    "build": "npm run build --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "format": "prettier --check \"apps/**/*.{ts,tsx,js,mjs,json,css,html}\" \"*.{json,yml,yaml}\"",
+    "format:write": "prettier --write \"apps/**/*.{ts,tsx,js,mjs,json,css,html}\" \"*.{json,yml,yaml}\"",
+    "check": "npm run typecheck && npm run lint && npm run format"
+  },
+  "devDependencies": {
+    "prettier": "^3.6.2"
+  }
+}
