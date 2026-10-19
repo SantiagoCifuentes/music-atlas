@@ -1,13 +1,34 @@
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { config as loadDotenv } from "dotenv";
+import { repositoryRoot } from "../repository-paths.js";
 
-export function loadDatabaseEnvironment(): void {
+export function loadDatabaseEnvironment(
+  environmentDirectory = repositoryRoot,
+): void {
   const fileName = process.env.NODE_ENV === "test" ? ".env.test" : ".env";
-  const path = resolve(process.cwd(), fileName);
+  const path = resolve(environmentDirectory, fileName);
 
-  if (existsSync(path)) {
-    loadDotenv({ path });
+  if (!existsSync(path)) {
+    if (process.env.NODE_ENV === "test") {
+      delete process.env.DATABASE_URL;
+      throw new Error(
+        `Missing ${fileName}. Copy .env.test.example to ${fileName} before running test database operations.`,
+      );
+    }
+    return;
+  }
+
+  const result = loadDotenv({
+    path,
+    override: process.env.NODE_ENV === "test",
+  });
+
+  if (process.env.NODE_ENV === "test" && !result.parsed?.DATABASE_URL) {
+    delete process.env.DATABASE_URL;
+    throw new Error(
+      `${fileName} must define DATABASE_URL for test operations.`,
+    );
   }
 }
 
@@ -33,13 +54,24 @@ export function requireDatabaseUrl(): string {
 }
 
 export function assertTestDatabaseUrl(url: string): void {
-  const databaseName = new URL(url).pathname.replace(/^\//, "");
+  const parsed = new URL(url);
+  const databaseName = parsed.pathname.replace(/^\//, "");
+  const allowedHosts = new Set(["localhost", "127.0.0.1", "::1"]);
 
-  if (!databaseName.endsWith("_test")) {
+  if (
+    databaseName !== "music_atlas_test" ||
+    !allowedHosts.has(parsed.hostname)
+  ) {
     throw new Error(
-      `Refusing test database operation for '${databaseName}'. Test databases must end with '_test'.`,
+      `Refusing test database operation for '${databaseName}' on '${parsed.hostname}'. Expected the local music_atlas_test database.`,
     );
   }
+}
+
+export function requireTestDatabaseUrl(): string {
+  const url = requireDatabaseUrl();
+  assertTestDatabaseUrl(url);
+  return url;
 }
 
 export function assertLocalResetAllowed(url: string): void {

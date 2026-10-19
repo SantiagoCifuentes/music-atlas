@@ -30,7 +30,7 @@
     { "id": "S26", "title": "Treddin' on Thin Ice - Wiley", "url": "https://music.apple.com/us/album/treddin-on-thin-ice/1136792572" }
   ],
   "entries": [
-    { "entryType": "country", "entryId": "england", "sourceIds": [], "englandConnectionNote": "England is the approved MVP country context defined by the requirements and domain decisions." },
+    { "entryType": "country", "entryId": "england", "sourceIds": ["S07"], "englandConnectionNote": "England is the approved MVP country context defined by the requirements and domain decisions." },
     { "entryType": "genre", "entryId": "merseybeat", "sourceIds": ["S07", "S08"], "englandConnectionNote": "Liverpool and the Cavern-era beat scene provide the genre's meaningful English context." },
     { "entryType": "genre", "entryId": "punk-rock", "sourceIds": ["S01", "S02", "S12"], "englandConnectionNote": "London punk played a substantial historical and cultural role in punk's development." },
     { "entryType": "genre", "entryId": "heavy-metal", "sourceIds": ["S03", "S04"], "englandConnectionNote": "Birmingham and Black Sabbath provide a substantial English role in heavy metal's development." },

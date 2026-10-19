@@ -15,6 +15,13 @@
       "when": 1792003743383,
       "tag": "0001_fix_constraint_triggers",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792003743384,
+      "tag": "0002_remove_scene_genre_requirement",
+      "breakpoints": true
     }
   ]
 }

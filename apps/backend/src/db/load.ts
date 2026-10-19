@@ -1,4 +1,8 @@
-import { validateContentFiles } from "../content/validate.js";
+import {
+  defaultCatalogPath,
+  defaultResearchNotesPath,
+  validateContentFiles,
+} from "../content/validate.js";
 import { createDatabase } from "./client.js";
 import {
   albumArtists,
@@ -14,9 +18,16 @@ import {
   scenes,
 } from "./schema.js";
 
-export async function loadCatalog(databaseUrl: string): Promise<void> {
+export async function loadCatalog(
+  databaseUrl: string,
+  catalogPath = defaultCatalogPath,
+  researchNotesPath = defaultResearchNotesPath,
+): Promise<void> {
+  const { catalog } = await validateContentFiles(
+    catalogPath,
+    researchNotesPath,
+  );
   const { db, pool } = createDatabase(databaseUrl);
-  const { catalog } = await validateContentFiles();
 
   try {
     await db.transaction(async (tx) => {

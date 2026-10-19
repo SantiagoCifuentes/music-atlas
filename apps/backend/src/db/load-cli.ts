@@ -1,10 +1,18 @@
 import { loadCatalog } from "./load.js";
-import { loadDatabaseEnvironment, requireDatabaseUrl } from "./environment.js";
+import {
+  loadDatabaseEnvironment,
+  requireDatabaseUrl,
+  requireTestDatabaseUrl,
+} from "./environment.js";
 
 loadDatabaseEnvironment();
+const databaseUrl =
+  process.env.NODE_ENV === "test"
+    ? requireTestDatabaseUrl()
+    : requireDatabaseUrl();
 
 try {
-  await loadCatalog(requireDatabaseUrl());
+  await loadCatalog(databaseUrl);
   console.log("Curated catalog loaded successfully.");
 } catch (error) {
   console.error(error instanceof Error ? error.message : error);

@@ -1,19 +1,60 @@
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { sql } from "drizzle-orm";
 import { beforeAll, describe, expect, it } from "vitest";
 import { createDatabase } from "./client.js";
-import { assertTestDatabaseUrl } from "./environment.js";
+import {
+  loadDatabaseEnvironment,
+  requireTestDatabaseUrl,
+} from "./environment.js";
+import {
+  defaultCatalogPath,
+  defaultResearchNotesPath,
+} from "../content/validate.js";
 import { catalogCounts, loadCatalog } from "./load.js";
-import { albumArtists, albumGenres, albums } from "./schema.js";
+import {
+  albumArtists,
+  albumGenres,
+  albumScenes,
+  albums,
+  artistGenres,
+  artistScenes,
+  artists,
+  countries,
+  genres,
+  sceneGenres,
+  scenes,
+} from "./schema.js";
 
-const databaseUrl = process.env.DATABASE_URL;
+process.env.NODE_ENV = "test";
+loadDatabaseEnvironment();
+const databaseUrl = requireTestDatabaseUrl();
+
+async function catalogSnapshot(url: string): Promise<string> {
+  const { db, pool } = createDatabase(url);
+
+  try {
+    return JSON.stringify({
+      countries: await db.select().from(countries),
+      genres: await db.select().from(genres),
+      scenes: await db.select().from(scenes),
+      artists: await db.select().from(artists),
+      albums: await db.select().from(albums),
+      sceneGenres: await db.select().from(sceneGenres),
+      artistGenres: await db.select().from(artistGenres),
+      artistScenes: await db.select().from(artistScenes),
+      albumArtists: await db.select().from(albumArtists),
+      albumGenres: await db.select().from(albumGenres),
+      albumScenes: await db.select().from(albumScenes),
+    });
+  } finally {
+    await pool.end();
+  }
+}
 
 describe("PostgreSQL catalog loading", () => {
   beforeAll(async () => {
-    if (!databaseUrl) {
-      throw new Error(
-        "DATABASE_URL is required for PostgreSQL integration tests.",
-      );
-    }
-    assertTestDatabaseUrl(databaseUrl);
     await loadCatalog(databaseUrl);
     await loadCatalog(databaseUrl);
   });
@@ -28,6 +69,11 @@ describe("PostgreSQL catalog loading", () => {
       artists: 18,
       albums: 18,
     });
+
+    const before = await catalogSnapshot(databaseUrl!);
+    await loadCatalog(databaseUrl!);
+    const after = await catalogSnapshot(databaseUrl!);
+    expect(after).toBe(before);
   });
 
   it("loads every album with at least one Genre association", async () => {
@@ -75,6 +121,65 @@ describe("PostgreSQL catalog loading", () => {
         (error as { cause?: { message?: string } }).cause?.message,
       ).toContain("must have at least one Genre");
     } finally {
+      await pool.end();
+    }
+  });
+
+  it("leaves the existing catalog unchanged when content validation fails", async () => {
+    const directory = await mkdtemp(join(tmpdir(), "music-atlas-invalid-"));
+    const invalidCatalogPath = join(directory, "catalog.json");
+    const catalog = JSON.parse(await readFile(defaultCatalogPath, "utf8")) as {
+      albums: Array<{ genreIds: string[] }>;
+    };
+    catalog.albums[0]!.genreIds = [];
+    await writeFile(invalidCatalogPath, JSON.stringify(catalog));
+
+    try {
+      const before = await catalogSnapshot(databaseUrl!);
+      await expect(
+        loadCatalog(databaseUrl!, invalidCatalogPath, defaultResearchNotesPath),
+      ).rejects.toThrow();
+      expect(await catalogSnapshot(databaseUrl!)).toBe(before);
+    } finally {
+      await rm(directory, { recursive: true, force: true });
+    }
+  });
+
+  it("rolls back partial database writes when the transaction fails", async () => {
+    const { db, pool } = createDatabase(databaseUrl!);
+    const triggerName = "phase2_test_fail_catalog_load";
+    const functionName = "phase2_test_fail_catalog_load_function";
+
+    try {
+      const before = await catalogSnapshot(databaseUrl!);
+      await db.execute(
+        sql.raw(`
+          CREATE OR REPLACE FUNCTION ${functionName}() RETURNS trigger AS $$
+          BEGIN
+            RAISE EXCEPTION 'forced Phase 2 rollback';
+          END;
+          $$ LANGUAGE plpgsql;
+        `),
+      );
+      await db.execute(
+        sql.raw(
+          `CREATE TRIGGER ${triggerName} AFTER INSERT ON countries FOR EACH ROW EXECUTE FUNCTION ${functionName}();`,
+        ),
+      );
+
+      const error = await loadCatalog(databaseUrl!)
+        .then(() => undefined)
+        .catch((caught: unknown) => caught);
+      expect(error).toBeDefined();
+      expect(
+        (error as { cause?: { message?: string } }).cause?.message,
+      ).toContain("forced Phase 2 rollback");
+      expect(await catalogSnapshot(databaseUrl!)).toBe(before);
+    } finally {
+      await db.execute(
+        sql.raw(`DROP TRIGGER IF EXISTS ${triggerName} ON countries`),
+      );
+      await db.execute(sql.raw(`DROP FUNCTION IF EXISTS ${functionName}()`));
       await pool.end();
     }
   });

@@ -5,10 +5,14 @@ import {
   assertLocalResetAllowed,
   loadDatabaseEnvironment,
   requireDatabaseUrl,
+  requireTestDatabaseUrl,
 } from "./environment.js";
 
 loadDatabaseEnvironment();
-const databaseUrl = requireDatabaseUrl();
+const databaseUrl =
+  process.env.NODE_ENV === "test"
+    ? requireTestDatabaseUrl()
+    : requireDatabaseUrl();
 assertLocalResetAllowed(databaseUrl);
 const { db, pool } = createDatabase(databaseUrl);
 

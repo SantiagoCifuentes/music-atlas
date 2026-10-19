@@ -181,12 +181,6 @@ export function validateCatalogObject(
     }
   });
 
-  catalog.scenes.forEach((scene) => {
-    if (scene.genreIds.length === 0) {
-      issues.push(`scene '${scene.id}' must have at least one genre`);
-    }
-  });
-
   if (issues.length > 0) {
     throw new ContentValidationError(
       `${filePath} has invalid references or domain constraints:\n${issues.map((issue) => `- ${issue}`).join("\n")}`,

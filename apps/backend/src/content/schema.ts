@@ -40,7 +40,7 @@ export const catalogSchema = z.strictObject({
         ...editorialEntry,
         timePeriod: z.string().trim().min(1),
         isOngoing: z.boolean(),
-        genreIds: z.array(id).min(1),
+        genreIds: z.array(id),
       }),
     )
     .min(1),
@@ -84,7 +84,7 @@ export const researchNotesSchema = z.strictObject({
       z.strictObject({
         id: sourceId,
         title: z.string().trim().min(1),
-        url: z.string().url(),
+        url: z.string().url().optional(),
       }),
     )
     .min(1),
@@ -93,7 +93,7 @@ export const researchNotesSchema = z.strictObject({
       z.strictObject({
         entryType: z.enum(["country", "genre", "scene", "artist", "album"]),
         entryId: id,
-        sourceIds: z.array(sourceId),
+        sourceIds: z.array(sourceId).min(1),
         englandConnectionNote: z.string().trim().min(1),
       }),
     )

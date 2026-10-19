@@ -13,7 +13,7 @@ docker compose ps
 
 The repository maps PostgreSQL to host port `5433` because port `5432` may already be used by a local Windows PostgreSQL installation. The container still listens on its standard port internally.
 
-Copy `.env.example` to `.env` and adjust values only for the local environment. The default development connection is:
+Copy `.env.example` to the repository root as `.env` and adjust values only for the local environment. The default development connection is:
 
 ```text
 postgresql://music_atlas:music_atlas@localhost:5433/music_atlas
@@ -57,7 +57,7 @@ The reset command truncates catalog data and reloads the validated content. It d
 
 ## Test Database
 
-Test configuration must be kept separate from development configuration. Copy `.env.test.example` to `.env.test`; it points to `music_atlas_test` and sets `NODE_ENV=test`.
+Test configuration must be kept separate from development configuration. Copy `.env.test.example` to the repository root as `.env.test`; it points to the local `music_atlas_test` database and sets `NODE_ENV=test`.
 
 Create the test database once when needed:
 
@@ -73,7 +73,7 @@ npm run db:init --workspace @music-atlas/backend
 $env:NODE_ENV = "development"
 ```
 
-The integration test setup rejects a database URL that does not identify a test database, preventing accidental operation on the development database.
+The integration test setup loads `.env.test` itself, overrides a conflicting inherited `DATABASE_URL`, and rejects missing, remote, development, or unexpected database targets. Test initialization and test migrations apply the same guard.
 
 Run Phase 2 tests:
 
