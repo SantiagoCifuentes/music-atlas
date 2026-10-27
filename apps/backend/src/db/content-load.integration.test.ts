@@ -33,20 +33,24 @@ const databaseUrl = requireTestDatabaseUrl();
 
 async function catalogSnapshot(url: string): Promise<string> {
   const { db, pool } = createDatabase(url);
+  const sortRows = (rows: readonly unknown[]) =>
+    [...rows].sort((left, right) =>
+      JSON.stringify(left).localeCompare(JSON.stringify(right)),
+    );
 
   try {
     return JSON.stringify({
-      countries: await db.select().from(countries),
-      genres: await db.select().from(genres),
-      scenes: await db.select().from(scenes),
-      artists: await db.select().from(artists),
-      albums: await db.select().from(albums),
-      sceneGenres: await db.select().from(sceneGenres),
-      artistGenres: await db.select().from(artistGenres),
-      artistScenes: await db.select().from(artistScenes),
-      albumArtists: await db.select().from(albumArtists),
-      albumGenres: await db.select().from(albumGenres),
-      albumScenes: await db.select().from(albumScenes),
+      countries: sortRows(await db.select().from(countries)),
+      genres: sortRows(await db.select().from(genres)),
+      scenes: sortRows(await db.select().from(scenes)),
+      artists: sortRows(await db.select().from(artists)),
+      albums: sortRows(await db.select().from(albums)),
+      sceneGenres: sortRows(await db.select().from(sceneGenres)),
+      artistGenres: sortRows(await db.select().from(artistGenres)),
+      artistScenes: sortRows(await db.select().from(artistScenes)),
+      albumArtists: sortRows(await db.select().from(albumArtists)),
+      albumGenres: sortRows(await db.select().from(albumGenres)),
+      albumScenes: sortRows(await db.select().from(albumScenes)),
     });
   } finally {
     await pool.end();

@@ -13,8 +13,8 @@
     "db:migrate": "tsx src/db/migrate.ts",
     "db:init": "tsx src/db/init.ts",
     "db:reset": "tsx src/db/reset.ts",
-    "test:unit": "vitest run src/content/validate.test.ts src/db/environment.test.ts",
-    "test:integration": "vitest run src/db/content-load.integration.test.ts"
+    "test:unit": "vitest run src/domain/catalog.test.ts src/content/validate.test.ts src/db/environment.test.ts",
+    "test:integration": "vitest run --no-file-parallelism src/db/content-load.integration.test.ts src/db/catalog-repository.integration.test.ts"
   },
   "dependencies": {
     "drizzle-orm": "^0.44.5",

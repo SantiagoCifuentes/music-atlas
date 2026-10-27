@@ -2,6 +2,10 @@ import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { repositoryRoot } from "../repository-paths.js";
 import {
+  DomainValidationError,
+  validateDomainCatalog,
+} from "../domain/catalog.js";
+import {
   catalogSchema,
   researchNotesSchema,
   type Catalog,
@@ -24,6 +28,22 @@ export class ContentValidationError extends Error {
   }
 }
 
+function uniqueIds(
+  values: readonly { id: string }[],
+  label: string,
+  issues: string[],
+): Set<string> {
+  const ids = new Set<string>();
+
+  for (const value of values) {
+    if (ids.has(value.id))
+      issues.push(`${label} contains duplicate id '${value.id}'`);
+    ids.add(value.id);
+  }
+
+  return ids;
+}
+
 async function readJsonFile(path: string): Promise<unknown> {
   let text: string;
 
@@ -44,59 +64,6 @@ async function readJsonFile(path: string): Promise<unknown> {
   }
 }
 
-function uniqueIds(
-  values: readonly { id: string }[],
-  label: string,
-  issues: string[],
-): Set<string> {
-  const ids = new Set<string>();
-
-  for (const value of values) {
-    if (ids.has(value.id)) {
-      issues.push(`${label} contains duplicate id '${value.id}'`);
-    }
-    ids.add(value.id);
-  }
-
-  return ids;
-}
-
-function checkReferences(
-  values: readonly {
-    id: string;
-    countryId: string;
-    genreIds?: string[];
-    sceneIds?: string[];
-  }[],
-  label: string,
-  countryIds: Set<string>,
-  genreIds: Set<string>,
-  sceneIds: Set<string>,
-  issues: string[],
-): void {
-  values.forEach((value) => {
-    if (!countryIds.has(value.countryId)) {
-      issues.push(
-        `${label} '${value.id}' references missing country '${value.countryId}'`,
-      );
-    }
-    value.genreIds?.forEach((genreId) => {
-      if (!genreIds.has(genreId)) {
-        issues.push(
-          `${label} '${value.id}' references missing genre '${genreId}'`,
-        );
-      }
-    });
-    value.sceneIds?.forEach((sceneId) => {
-      if (!sceneIds.has(sceneId)) {
-        issues.push(
-          `${label} '${value.id}' references missing scene '${sceneId}'`,
-        );
-      }
-    });
-  });
-}
-
 export function validateCatalogObject(
   value: unknown,
   filePath = "content/catalog.json",
@@ -111,11 +78,7 @@ export function validateCatalogObject(
 
   const catalog = parsed.data;
   const issues: string[] = [];
-  const countryIds = uniqueIds(catalog.countries, "countries", issues);
-  const genreIds = uniqueIds(catalog.genres, "genres", issues);
-  const sceneIds = uniqueIds(catalog.scenes, "scenes", issues);
-  const artistIds = uniqueIds(catalog.artists, "artists", issues);
-  uniqueIds(catalog.albums, "albums", issues);
+  const countryIds = new Set(catalog.countries.map((country) => country.id));
 
   if (catalog.countries.length !== 1 || !countryIds.has("england")) {
     issues.push(
@@ -123,63 +86,12 @@ export function validateCatalogObject(
     );
   }
 
-  checkReferences(
-    catalog.genres,
-    "genre",
-    countryIds,
-    genreIds,
-    sceneIds,
-    issues,
-  );
-  checkReferences(
-    catalog.scenes,
-    "scene",
-    countryIds,
-    genreIds,
-    sceneIds,
-    issues,
-  );
-  checkReferences(
-    catalog.artists,
-    "artist",
-    countryIds,
-    genreIds,
-    sceneIds,
-    issues,
-  );
-  checkReferences(
-    catalog.albums,
-    "album",
-    countryIds,
-    genreIds,
-    sceneIds,
-    issues,
-  );
-
-  catalog.albums.forEach((album) => {
-    album.artistIds.forEach((artistId) => {
-      if (!artistIds.has(artistId)) {
-        issues.push(
-          `album '${album.id}' references missing artist '${artistId}'`,
-        );
-      }
-    });
-    if (album.artistIds.length === 0) {
-      issues.push(`album '${album.id}' must have at least one artist`);
-    }
-    if (album.genreIds.length === 0) {
-      issues.push(`album '${album.id}' must have at least one genre`);
-    }
-  });
-
-  catalog.artists.forEach((artist) => {
-    const hasAlbum = catalog.albums.some((album) =>
-      album.artistIds.includes(artist.id),
-    );
-    if (!hasAlbum) {
-      issues.push(`artist '${artist.id}' must have at least one album`);
-    }
-  });
+  try {
+    validateDomainCatalog(catalog);
+  } catch (error) {
+    if (error instanceof DomainValidationError) issues.push(...error.issues);
+    else throw error;
+  }
 
   if (issues.length > 0) {
     throw new ContentValidationError(
