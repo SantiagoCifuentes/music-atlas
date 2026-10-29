@@ -18,21 +18,21 @@ import type { CatalogRepository } from "../domain/repositories.js";
 
 const fixture = {
   country: {
-    id: "fixture-england",
-    slug: "fixture-england",
-    name: "Fixture England",
+    id: "england",
+    slug: "england",
+    name: "England",
     description: "Isolated repository-test country.",
   },
   genre: {
     id: "fixture-post-punk",
-    countryId: "fixture-england",
+    countryId: "england",
     slug: "fixture-post-punk",
     name: "Fixture Post-Punk",
     description: "Isolated repository-test genre.",
   },
   sceneWithGenre: {
     id: "fixture-scene-with-genre",
-    countryId: "fixture-england",
+    countryId: "england",
     slug: "fixture-scene-with-genre",
     name: "Fixture Scene With Genre",
     description: "A scene with an explicit genre association.",
@@ -41,7 +41,7 @@ const fixture = {
   },
   sceneWithoutGenre: {
     id: "fixture-scene-without-genre",
-    countryId: "fixture-england",
+    countryId: "england",
     slug: "fixture-scene-without-genre",
     name: "Fixture Scene Without Genre",
     description: "A valid scene with no forced genre association.",
@@ -50,14 +50,14 @@ const fixture = {
   },
   artist: {
     id: "fixture-artist",
-    countryId: "fixture-england",
+    countryId: "england",
     slug: "fixture-artist",
     name: "Fixture Artist",
     description: "Isolated repository-test artist.",
   },
   albumWithoutScene: {
     id: "fixture-album-without-scene",
-    countryId: "fixture-england",
+    countryId: "england",
     slug: "fixture-album-without-scene",
     title: "Fixture Album Without Scene",
     description: "An album with no Scene association.",
@@ -65,11 +65,18 @@ const fixture = {
   },
   albumWithScene: {
     id: "fixture-album-with-scene",
-    countryId: "fixture-england",
+    countryId: "england",
     slug: "fixture-album-with-scene",
     title: "Fixture Album With Scene",
     description: "An album with a Scene association.",
     releaseType: "ep" as const,
+  },
+  orphanGenre: {
+    id: "fixture-orphan-genre",
+    countryId: "england",
+    slug: "fixture-orphan-genre",
+    name: "Fixture Orphan Genre",
+    description: "A genre with no related artists for empty-result testing.",
   },
 };
 
@@ -93,6 +100,7 @@ async function insertFixture(db: ReturnType<typeof createDatabase>["db"]) {
   await db.transaction(async (tx) => {
     await tx.insert(countries).values(fixture.country);
     await tx.insert(genres).values(fixture.genre);
+    await tx.insert(genres).values(fixture.orphanGenre);
     await tx
       .insert(scenes)
       .values([fixture.sceneWithGenre, fixture.sceneWithoutGenre]);

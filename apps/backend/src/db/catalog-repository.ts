@@ -173,6 +173,24 @@ export function createCatalogRepository(db: Database): CatalogRepository {
       return rows[0] ? mapCountry(rows[0]) : null;
     },
 
+    async findGenresByCountryId(countryId) {
+      const rows = await db
+        .select()
+        .from(genres)
+        .where(eq(genres.countryId, countryId))
+        .orderBy(asc(genres.id));
+      return rows.map(mapGenre);
+    },
+
+    async findScenesByCountryId(countryId) {
+      const rows = await db
+        .select()
+        .from(scenes)
+        .where(eq(scenes.countryId, countryId))
+        .orderBy(asc(scenes.id));
+      return Promise.all(rows.map(mapScene));
+    },
+
     async findGenreById(id) {
       const rows = await db
         .select()
