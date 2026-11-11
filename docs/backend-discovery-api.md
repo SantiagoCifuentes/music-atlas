@@ -26,7 +26,13 @@ Retrieve an Artist and its related Albums:
 GET /api/artists/{artistId}
 ```
 
-Successful responses use a `data` wrapper. Related entities are explicit catalog representations containing stable IDs, editorial fields, and approved relationship IDs. Research notes and source metadata are never serialized.
+Retrieve an Album and its curated relationship identifiers:
+
+```text
+GET /api/albums/{albumId}
+```
+
+Successful responses use a `data` wrapper. Related entities are explicit catalog representations containing stable IDs, editorial fields, and approved relationship IDs. The Album response also includes its related Artist representations. Research notes and source metadata are never serialized.
 
 Example response shape:
 

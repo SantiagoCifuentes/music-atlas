@@ -23,6 +23,11 @@ export interface ArtistDiscovery {
   albums: Album[];
 }
 
+export interface AlbumDiscovery {
+  album: Album;
+  artists: Artist[];
+}
+
 export function createDiscoveryService(repository: CatalogRepository) {
   return {
     async getCountryDiscovery(id: string): Promise<EnglandDiscovery | null> {
@@ -54,6 +59,19 @@ export function createDiscoveryService(repository: CatalogRepository) {
       return {
         artist,
         albums: await repository.findAlbumsByArtistId(id),
+      };
+    },
+
+    async getAlbumDiscovery(id: string): Promise<AlbumDiscovery | null> {
+      const album = await repository.findAlbumById(id);
+      if (!album) return null;
+
+      const artists = await Promise.all(
+        album.artistIds.map((artistId) => repository.findArtistById(artistId)),
+      );
+      return {
+        album,
+        artists: artists.flatMap((artist) => (artist ? [artist] : [])),
       };
     },
   };

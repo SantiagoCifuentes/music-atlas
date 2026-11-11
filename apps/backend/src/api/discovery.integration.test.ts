@@ -51,10 +51,27 @@ describe("first discovery API journey", () => {
           ]),
         );
 
+        const albumResponse = await app.inject(
+          "/api/albums/fixture-album-with-scene",
+        );
+        expect(albumResponse.statusCode).toBe(200);
+        expect(albumResponse.json()).toMatchObject({
+          data: {
+            album: {
+              id: "fixture-album-with-scene",
+              artistIds: ["fixture-artist"],
+              genreIds: ["fixture-post-punk"],
+              sceneIds: ["fixture-scene-with-genre"],
+            },
+            artists: [{ id: "fixture-artist" }],
+          },
+        });
+
         const responseText = JSON.stringify([
           countryBody,
           genreBody,
           artistBody,
+          albumResponse.json(),
         ]).toLowerCase();
         expect(responseText).not.toContain("research");
         expect(responseText).not.toContain("sourceids");
@@ -90,6 +107,15 @@ describe("first discovery API journey", () => {
           error: {
             code: "NOT_FOUND",
             message: "Artist 'missing-artist' was not found.",
+          },
+        });
+
+        const missingAlbum = await app.inject("/api/albums/missing-album");
+        expect(missingAlbum.statusCode).toBe(404);
+        expect(missingAlbum.json()).toEqual({
+          error: {
+            code: "NOT_FOUND",
+            message: "Album 'missing-album' was not found.",
           },
         });
 

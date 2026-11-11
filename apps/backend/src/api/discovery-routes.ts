@@ -145,4 +145,19 @@ export function registerDiscoveryRoutes(
       },
     };
   });
+
+  app.get("/api/albums/:id", async (request) => {
+    const id = parseId(request.params);
+    const discovery = await service.getAlbumDiscovery(id);
+    if (!discovery) {
+      throw new ApiError(404, "NOT_FOUND", `Album '${id}' was not found.`);
+    }
+
+    return {
+      data: {
+        album: albumResponse(discovery.album),
+        artists: discovery.artists.map(artistResponse),
+      },
+    };
+  });
 }
